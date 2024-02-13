@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="https://malsup.github.io/jquery.form.js"></script>
+
+    <style>
+        .secrets {
+            display: none;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div class="login">
+        Welcome to Secret Keeper.<br><br>
+
+        <form id='retrieveUser' action="/retrieve_user">
+            <label for="userUuid">Enter existing secret ID:</label>
+            <input type="text" id="userUuid" name="userUuid"><br><br>
+            <input type="submit" value="Retrieve your secrets!">
+        </form>
+
+        <br><br>
+
+        <form id="generateUuid" action="/generate_uuid">
+            <label for="username">Create your username:</label>
+            <input type="text" id="username" name="username"><br><br>
+            <input type="submit" value="Generate new secret ID">
+        </form>
+    </div>
+
+    <div class="secrets">
+        <div class="welcome"></div>
+
+        <br><br>
+
+        <form id="addSecret" action="/add_secret">
+            <label for="secret">Add a secret:</label>
+            <input type="text" id="secret" name="secret"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+</body>
+
+<script>
+    const setSecretsForm = ({isNewUser, userUuid, username}) => {
+        const secretsSection = $('.secrets')
+
+        $('.welcome', secretsSection).html(
+            isNewUser ?
+                `Make a note of your UUID: ${userUuid}. You will need it to retrieve your secrets!` :
+                `Hello ${username}!`
+        )
+
+        $('#addSecret').append(`<input type="hidden" id="senderUuid" name="senderUuid" value=${userUuid}>` )
+
+        $('.login').hide();
+        $(secretsSection).show();
+
+    }
+
+    $(document).ready(() => {
+        $('#retrieveUser').ajaxForm(setSecretsForm);
+        $('#generateUuid').ajaxForm(setSecretsForm);
+        $('#addSecret').ajaxForm(() => {
+            $('#addSecret').trigger('reset');
+            alert('Message added!');
+        })
+    });
+</script>
+
+</html>
